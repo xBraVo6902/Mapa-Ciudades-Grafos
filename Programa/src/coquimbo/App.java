@@ -23,7 +23,7 @@ public class App {
         double minY = Double.POSITIVE_INFINITY;
         
         
-        
+        //Hola
         try {
             File file = new File("nodes.xml"); // Se abre XML
             		
