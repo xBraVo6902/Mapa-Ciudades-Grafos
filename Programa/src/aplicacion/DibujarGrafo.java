@@ -5,6 +5,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -20,6 +21,10 @@ public class DibujarGrafo extends JPanel {
     private double escalaY;
     private Point2D.Double vistaCentro;
     private MyPoint nodoMasCercano = null;
+
+    private Point2D.Double puntoAntesZoom;//para implementar zoom respecto del mouse
+    private Point2D.Double puntoDespuesZoom;
+
     
     private MyPoint primerNodo = null; //-->dibujar nodo rojo
     private MyPoint segundoNodo = null; //-->primerNodo!= null ---> dibujar nodo Azul
@@ -44,13 +49,37 @@ public class DibujarGrafo extends JPanel {
 
         setFocusable(true);
         requestFocusInWindow();
+        addMouseWheelListener(new MouseAdapter() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {//Este trozo de codigo sirve para la rueda del raton (Se supone)
+                int notches = e.getWheelRotation();
+                Point puntoRaton = e.getPoint();
+
+                puntoAntesZoom = new Point2D.Double((puntoRaton.getX() + vistaX) / escalaX + minX, (puntoRaton.getY() + vistaY) / escalaY + minY);
+
+                if (notches > 0) {
+                    zoomOut();
+                } else {
+                    zoomIn();
+                }
+
+                puntoDespuesZoom = new Point2D.Double((puntoRaton.getX() + vistaX) / escalaX + minX, (puntoRaton.getY() + vistaY) / escalaY + minY);
+
+                double diferenciaX = puntoAntesZoom.getX() - puntoDespuesZoom.getX();
+                double diferenciaY = puntoAntesZoom.getY() - puntoDespuesZoom.getY();
+
+                vistaCentro.setLocation(vistaCentro.getX() + diferenciaX, vistaCentro.getY() + diferenciaY);
+
+                repaint();
+            }
+        });
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
-                    zoomIn();
-                } else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
                     zoomOut();
+                } else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
+                    zoomIn();
                 } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     moveLeft();
                 } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
