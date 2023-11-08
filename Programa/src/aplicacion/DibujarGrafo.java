@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -22,10 +21,7 @@ public class DibujarGrafo extends JPanel {
     private double escalaY;
     private Point2D.Double vistaCentro;
     private MyPoint nodoMasCercano = null;
-
-    private Point2D.Double puntoAntesZoom;//para implementar zoom respecto del mouse
-    private Point2D.Double puntoDespuesZoom;
-
+    private Point zoomCenter;
     
     private MyPoint primerNodo = null; //-->dibujar nodo rojo
     private MyPoint segundoNodo = null; //-->primerNodo!= null ---> dibujar nodo Azul
@@ -50,39 +46,10 @@ public class DibujarGrafo extends JPanel {
 
         setFocusable(true);
         requestFocusInWindow();
-        addMouseWheelListener(new MouseAdapter() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {//Este trozo de codigo sirve para la rueda del raton (Se supone)
-                int notches = e.getWheelRotation();
-                Point puntoRaton = e.getPoint();
-
-                puntoAntesZoom = new Point2D.Double((puntoRaton.getX() + vistaX) / escalaX + minX, (puntoRaton.getY() + vistaY) / escalaY + minY);
-
-                if (notches > 0) {
-                    zoomOut();
-                    
-                } else {
-                    zoomIn(250,250);
-                }
-
-                puntoDespuesZoom = new Point2D.Double((puntoRaton.getX() + vistaX) / escalaX + minX, (puntoRaton.getY() + vistaY) / escalaY + minY);
-
-                double diferenciaX = puntoAntesZoom.getX() - puntoDespuesZoom.getX();
-                double diferenciaY = puntoAntesZoom.getY() - puntoDespuesZoom.getY();
-
-                vistaCentro.setLocation(vistaCentro.getX() + diferenciaX, vistaCentro.getY() + diferenciaY);
-
-                repaint();
-            }
-        });
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
-                    zoomOut();
-                } else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
-                    zoomIn();
-                } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     moveLeft();
                 } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     moveRight();
@@ -103,6 +70,45 @@ public class DibujarGrafo extends JPanel {
                 repaint();
             }
         });
+
+        addMouseMotionListener(new MouseAdapter() {
+    private Point lastPoint;
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        lastPoint = e.getPoint();
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (lastPoint != null) {
+            int deltaX = e.getX() - lastPoint.x;
+            int deltaY = e.getY() - lastPoint.y;
+            lastPoint = e.getPoint();
+
+            vistaCentro.setLocation(
+                vistaCentro.getX() + deltaX / escalaX,
+                vistaCentro.getY() + deltaY / escalaY
+            );
+            repaint();
+        }
+    }
+});
+
+        addMouseWheelListener(new MouseAdapter() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int notches = e.getWheelRotation();
+                if (notches < 0) {
+                    zoomOut(e.getPoint());  // Pasa la posición del mouse como argumento
+                } else {
+                    zoomIn(e.getPoint());  // Pasa la posición del mouse como argumento
+                    
+                }
+            }
+        });
+        
+        
     
      // Crear el botón y agregar un ActionListener para manejar su acción
 	    JButton closeButton = new JButton("Cerrar");
@@ -119,19 +125,6 @@ public class DibujarGrafo extends JPanel {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(closeButton);
         add(buttonPanel, BorderLayout.SOUTH); // Puedes ajustar la posición del botón según tus necesidades
-    }
-    public void zoomIn(int zoomPointX, int zoomPointY) {
-        // Calcula la nueva transformación de escala con el factor de zoom
-        AffineTransform transform = new AffineTransform();
-        transform.translate(zoomPointX, zoomPointY);
-        transform.scale(1.1, 1.1); // Incrementa el tamaño en 10%
-        transform.translate(-zoomPointX, -zoomPointY);
-    
-        // Aplica la nueva transformación de escala al gráfico
-        ((Graphics2D) getGraphics()).setTransform(transform);
-    
-        // Vuelve a pintar el contenido del JPanel para aplicar el zoom
-        repaint();
     }
 
     private void encontrarNodoMasCercano(Point puntoClic) {
@@ -169,21 +162,21 @@ public class DibujarGrafo extends JPanel {
     private double distanciaHaversine(MyPoint punto1, MyPoint punto2) {
         double radioTierra = 6371.0; // Radio de la Tierra en kilómetros
 
-        // Convertir las coordenadas de los puntos a latitud y longitud
-        double latitud1 = referenciaLatitud + (punto1.getY() - vistaCentro.getY()) / escalaY;
-        double longitud1 = referenciaLongitud + (punto1.getX() - vistaCentro.getX()) / escalaX;
+        // Convertir las coordenadas de los nodos a latitud y longitud
+        double latitud1 = referenciaLatitud + punto1.getY();
+        double longitud1 = referenciaLongitud + punto1.getX();
 
-        double latitud2 = referenciaLatitud + (punto2.getY() - vistaCentro.getY()) / escalaY;
-        double longitud2 = referenciaLongitud + (punto2.getX() - vistaCentro.getX()) / escalaX;
+        double latitud2 = referenciaLatitud + punto2.getY();
+        double longitud2 = referenciaLongitud + punto2.getX();
 
-        // Calcular las diferencias en latitud y longitud en radianes
+        // Calcular la diferencia en latitud y longitud en radianes
         double dLatitud = Math.toRadians(latitud2 - latitud1);
         double dLongitud = Math.toRadians(longitud2 - longitud1);
 
         // Aplicar la fórmula de Haversine
         double a = Math.sin(dLatitud / 2) * Math.sin(dLatitud / 2) +
-                   Math.cos(Math.toRadians(latitud1)) * Math.cos(Math.toRadians(latitud2)) *
-                   Math.sin(dLongitud / 2) * Math.sin(dLongitud / 2);
+                       Math.cos(Math.toRadians(latitud1)) * Math.cos(Math.toRadians(latitud2)) *
+                       Math.sin(dLongitud / 2) * Math.sin(dLongitud / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -263,14 +256,27 @@ public class DibujarGrafo extends JPanel {
         frame.setVisible(true);
     }
 
-    public void zoomIn() {
+    public void zoomIn(Point mousePoint) {
+        double prevZoom = zoom;
         zoom *= 1.2;
+        ajustarCentroZoom(mousePoint, prevZoom, zoom);
         repaint();
     }
 
-    public void zoomOut() {
+    public void zoomOut(Point mousePoint) {
+        double prevZoom = zoom;
         zoom /= 1.2;
+        ajustarCentroZoom(mousePoint, prevZoom, zoom);
         repaint();
+    }
+
+    private void ajustarCentroZoom(Point mousePoint, double prevZoom, double newZoom) {
+        double factor = newZoom / prevZoom;
+        double dx = (mousePoint.x - getWidth() / 2) / -escalaX;
+        double dy = (mousePoint.y - getHeight() / 2) / -escalaY;
+        vistaCentro.setLocation(vistaCentro.getX() - dx * factor, vistaCentro.getY() - dy * factor);
+        
+
     }
 
     public void moveLeft() {
