@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -59,8 +60,9 @@ public class DibujarGrafo extends JPanel {
 
                 if (notches > 0) {
                     zoomOut();
+                    
                 } else {
-                    zoomIn();
+                    zoomIn(250,250);
                 }
 
                 puntoDespuesZoom = new Point2D.Double((puntoRaton.getX() + vistaX) / escalaX + minX, (puntoRaton.getY() + vistaY) / escalaY + minY);
@@ -117,6 +119,19 @@ public class DibujarGrafo extends JPanel {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(closeButton);
         add(buttonPanel, BorderLayout.SOUTH); // Puedes ajustar la posición del botón según tus necesidades
+    }
+    public void zoomIn(int zoomPointX, int zoomPointY) {
+        // Calcula la nueva transformación de escala con el factor de zoom
+        AffineTransform transform = new AffineTransform();
+        transform.translate(zoomPointX, zoomPointY);
+        transform.scale(1.1, 1.1); // Incrementa el tamaño en 10%
+        transform.translate(-zoomPointX, -zoomPointY);
+    
+        // Aplica la nueva transformación de escala al gráfico
+        ((Graphics2D) getGraphics()).setTransform(transform);
+    
+        // Vuelve a pintar el contenido del JPanel para aplicar el zoom
+        repaint();
     }
 
     private void encontrarNodoMasCercano(Point puntoClic) {
