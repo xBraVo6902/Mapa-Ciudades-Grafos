@@ -23,6 +23,12 @@ public class DibujarGrafo extends JPanel {
     private MyPoint nodoMasCercano = null;
     private Point zoomCenter;
     
+    private static final int TOP = 1;
+    private static final int BOTTOM = 2;
+    private static final int RIGHT = 4;
+    private static final int LEFT = 8;
+    private int sumadorLineas = 0;
+
     private MyPoint primerNodo = null; //-->dibujar nodo rojo
     private MyPoint segundoNodo = null; //-->primerNodo!= null ---> dibujar nodo Azul
     
@@ -193,15 +199,24 @@ public class DibujarGrafo extends JPanel {
 
         vistaX = (vistaCentro.getX() - minX) * escalaX;
         vistaY = (vistaCentro.getY() - minY) * escalaY;
-
+        int cantTotalLineas=0;
         for (Line2D.Double conexion : conexiones) {
             double x1 = (conexion.getX1() - minX) * escalaX - vistaX;
             double y1 = (conexion.getY1() - minY) * escalaY - vistaY;
             double x2 = (conexion.getX2() - minX) * escalaX - vistaX;
             double y2 = (conexion.getY2() - minY) * escalaY - vistaY;
-
-            g2d.draw(new Line2D.Double(x1, y1, x2, y2));
+            if(clipLine(x1,y1,x2,y2))
+            {
+                sumadorLineas++;
+                g2d.draw(new Line2D.Double(x1, y1, x2, y2));
+            }
+            cantTotalLineas++;
+            
         }
+        System.out.println("Cantidad de lineas dibujadas: "+sumadorLineas);
+        System.out.println("Cantidad de lineas totales: "+cantTotalLineas);
+        cantTotalLineas=0;
+        sumadorLineas=0;
 
         // nodo mas cercano actual-.
         if (nodoMasCercano != null) {
@@ -246,6 +261,79 @@ public class DibujarGrafo extends JPanel {
             double distancia = distanciaHaversine(primerNodo, segundoNodo);
             System.out.println("Distancia entre dos nodos: " + distancia + " km");
         }
+    }
+
+    private boolean clipLine(double x1, double y1, double x2, double y2) {
+        double clipMinX = 0;
+        double clipMinY = 0;
+        double clipMaxX = getWidth();
+        double clipMaxY = getHeight();
+    
+        // Cohen-Sutherland line clipping algorithm
+        int outCode1 = calculateOutCode(x1, y1, clipMinX, clipMinY, clipMaxX, clipMaxY);
+        int outCode2 = calculateOutCode(x2, y2, clipMinX, clipMinY, clipMaxX, clipMaxY);
+    
+        while ((outCode1 | outCode2) != 0) {
+            if ((outCode1 & outCode2) != 0) {
+                // Ambos puntos están fuera de la ventana de visualización, la línea está completamente fuera
+                return false;
+            }
+    
+            // Escoge un punto exterior
+            int outCode = (outCode1 != 0) ? outCode1 : outCode2;
+    
+            double x, y;
+    
+            // Encuentra la intersección de la línea con la ventana de visualización
+            if ((outCode & TOP) != 0) {
+                x = x1 + (x2 - x1) * (clipMaxY - y1) / (y2 - y1);
+                y = clipMaxY;
+            } else if ((outCode & BOTTOM) != 0) {
+                x = x1 + (x2 - x1) * (clipMinY - y1) / (y2 - y1);
+                y = clipMinY;
+            } else if ((outCode & RIGHT) != 0) {
+                y = y1 + (y2 - y1) * (clipMaxX - x1) / (x2 - x1);
+                x = clipMaxX;
+            } else if ((outCode & LEFT) != 0) {
+                y = y1 + (y2 - y1) * (clipMinX - x1) / (x2 - x1);
+                x = clipMinX;
+            } else {
+                // Este caso no debería ocurrir
+                return false;
+            }
+    
+            if (outCode == outCode1) {
+                x1 = x;
+                y1 = y;
+                outCode1 = calculateOutCode(x1, y1, clipMinX, clipMinY, clipMaxX, clipMaxY);
+            } else {
+                x2 = x;
+                y2 = y;
+                outCode2 = calculateOutCode(x2, y2, clipMinX, clipMinY, clipMaxX, clipMaxY);
+            }
+        }
+    
+        // La línea o parte de ella está dentro de la ventana de visualización
+        return true;
+    }
+    
+    // Método para calcular el código de salida en el algoritmo de clipping
+    private int calculateOutCode(double x, double y, double clipMinX, double clipMinY, double clipMaxX, double clipMaxY) {
+        int code = 0;
+    
+        if (x < clipMinX) {
+            code |= LEFT;
+        } else if (x > clipMaxX) {
+            code |= RIGHT;
+        }
+    
+        if (y < clipMinY) {
+            code |= TOP;
+        } else if (y > clipMaxY) {
+            code |= BOTTOM;
+        }
+    
+        return code;
     }
 
     public void dibujar() {
