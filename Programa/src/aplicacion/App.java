@@ -14,6 +14,7 @@ public class App {
     public static void cargarArchivo(String filePath1,String filePath2) {
         
         ArrayList<MyPoint> coordenadas = new ArrayList<>();
+        ArrayList<String> nombreCalles = new ArrayList<>();
         ArrayList<Line2D.Double> conexiones= new  ArrayList<>();
         
         
@@ -72,6 +73,7 @@ public class App {
                 Element rowElement = (Element) rowElements.item(i);
                 double id_1 = Double.parseDouble(rowElement.getElementsByTagName("u").item(0).getTextContent());
                 double id_2 = Double.parseDouble(rowElement.getElementsByTagName("v").item(0).getTextContent());
+                String nombreCamino = rowElement.getElementsByTagName("name").item(0).getTextContent();
                 
                 MyPoint punto1 = null;
                 MyPoint punto2 = null;
@@ -88,7 +90,7 @@ public class App {
                         Line2D.Double conexion = new Line2D.Double(punto1.getX(), punto1.getY(), punto2.getX(), punto2.getY());
                         
                         conexiones.add(conexion);
-                        
+                        nombreCalles.add(nombreCamino);
                         break;
                     }
                 
@@ -98,7 +100,7 @@ public class App {
             } } catch (Exception e) {
             e.printStackTrace();
         }
-        DibujarGrafo dibujarGrafo = new DibujarGrafo(conexiones, coordenadas, minX, minY, maxX, maxY);
+        DibujarGrafo dibujarGrafo = new DibujarGrafo(conexiones, coordenadas, minX, minY, maxX, maxY,nombreCalles);
 
         dibujarGrafo.dibujar();
     }

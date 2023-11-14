@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 public class DibujarGrafo extends JPanel {
     private ArrayList<Line2D.Double> conexiones;
     private ArrayList<MyPoint> coordenadas;
+    private ArrayList<String> nombreCaminos;
     private double minX, minY, maxX, maxY;
     private double zoom = 1.0;
     private double escalaX;
@@ -40,9 +41,10 @@ public class DibujarGrafo extends JPanel {
     private double referenciaLatitud; // Establece la latitud de referencia aquí
     private double referenciaLongitud; // Establece la longitud de referencia aquí
 
-    public DibujarGrafo(ArrayList<Line2D.Double> conexiones, ArrayList<MyPoint> coordenadas, double minX, double minY, double maxX, double maxY) {
+    public DibujarGrafo(ArrayList<Line2D.Double> conexiones, ArrayList<MyPoint> coordenadas, double minX, double minY, double maxX, double maxY,ArrayList<String> nombreCaminos) {
         this.conexiones = conexiones;
         this.coordenadas = coordenadas;
+        this.nombreCaminos=nombreCaminos;
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
@@ -200,7 +202,7 @@ public class DibujarGrafo extends JPanel {
         vistaX = (vistaCentro.getX() - minX) * escalaX;
         vistaY = (vistaCentro.getY() - minY) * escalaY;
         int cantTotalLineas=0;
-        for (Line2D.Double conexion : conexiones) {
+        /*for (Line2D.Double conexion : conexiones) {
             double x1 = (conexion.getX1() - minX) * escalaX - vistaX;
             double y1 = (conexion.getY1() - minY) * escalaY - vistaY;
             double x2 = (conexion.getX2() - minX) * escalaX - vistaX;
@@ -208,10 +210,41 @@ public class DibujarGrafo extends JPanel {
             if(clipLine(x1,y1,x2,y2))
             {
                 sumadorLineas++;
+                
                 g2d.draw(new Line2D.Double(x1, y1, x2, y2));
             }
             cantTotalLineas++;
             
+        } */
+        Line2D.Double conexion;
+        String nombreCamino;
+        for(int i =0; i <conexiones.size();i++)
+        {
+            conexion = conexiones.get(i);
+            nombreCamino = nombreCaminos.get(i);
+            double x1 = (conexion.getX1() - minX) * escalaX - vistaX;
+            double y1 = (conexion.getY1() - minY) * escalaY - vistaY;
+            double x2 = (conexion.getX2() - minX) * escalaX - vistaX;
+            double y2 = (conexion.getY2() - minY) * escalaY - vistaY;
+            if(clipLine(x1,y1,x2,y2))
+            {
+
+                sumadorLineas++;
+                if (nombreCamino.compareToIgnoreCase("nan")==0) 
+                {
+                        g2d.setColor(Color.DARK_GRAY);
+                }
+                else if(nombreCamino.contains("Ruta"))
+                {
+                    g2d.setColor(Color.GREEN);
+                }
+                else
+                {
+                    g2d.setColor(Color.BLUE);
+                }
+                g2d.draw(new Line2D.Double(x1, y1, x2, y2));
+            }
+            cantTotalLineas++;
         }
         System.out.println("Cantidad de lineas dibujadas: "+sumadorLineas);
         System.out.println("Cantidad de lineas totales: "+cantTotalLineas);
