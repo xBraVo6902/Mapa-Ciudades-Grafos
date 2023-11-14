@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
@@ -79,7 +80,7 @@ public class inicio extends JFrame {
 			                JOptionPane.INFORMATION_MESSAGE);
 
 			        // Crear y mostrar el nuevo panel después de iniciar sesión
-			        probando p1 = new probando();
+			        panelPrincipal p1 = new panelPrincipal();
 			        p1.setSize(470, 536);
 			        p1.setLocation(0, 0);
 			        PanelLogin.removeAll();
@@ -149,7 +150,7 @@ public class inicio extends JFrame {
 	//Leer block de notas de los usuarios registrados
 	private void leerUsuarios() {
 		try {
-			Scanner read= new Scanner(new File("Programa\\usuarios.txt"));
+			Scanner read= new Scanner(new File("usuarios.txt"));
 			while(read.hasNextLine()) {
 				String line= read.nextLine();
 				String[]parts= line.split(",");
