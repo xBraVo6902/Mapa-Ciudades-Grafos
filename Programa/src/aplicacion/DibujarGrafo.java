@@ -22,7 +22,6 @@ public class DibujarGrafo extends JPanel {
     private double escalaY;
     private Point2D.Double vistaCentro;
     private MyPoint nodoMasCercano = null;
-    private Point zoomCenter;
     
     private static final int TOP = 1;
     private static final int BOTTOM = 2;
@@ -33,7 +32,6 @@ public class DibujarGrafo extends JPanel {
     private MyPoint primerNodo = null; //-->dibujar nodo rojo
     private MyPoint segundoNodo = null; //-->primerNodo!= null ---> dibujar nodo Azul
     
-    private Point2D.Double nodoResultante=null;
     private double vistaX;
     private double vistaY;
 
@@ -253,10 +251,6 @@ public class DibujarGrafo extends JPanel {
 
         // nodo mas cercano actual-.
         if (nodoMasCercano != null) {
-            double x = (nodoMasCercano.getX() - minX) * escalaX - vistaX;
-            double y = (nodoMasCercano.getY() - minY) * escalaY - vistaY;
-
-            int radio = 5;
             g2d.setColor(Color.RED);
             //g2d.drawOval((int) (x - radio), (int) (y - radio), 2 * radio, 2 * radio); //NO DIBUJAR EL NODO CLICK MAS RECIENTE
         }

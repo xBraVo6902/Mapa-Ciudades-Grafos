@@ -1,6 +1,5 @@
 package ventanas;
 
-import aplicacion.App;
 import paneles.*;
 import javax.swing.*;
 
