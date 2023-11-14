@@ -1,5 +1,4 @@
 package aplicacion;
-import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
@@ -7,7 +6,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import java.awt.geom.Point2D;
 import java.awt.geom.Line2D;
 public class App {
 
@@ -105,7 +103,8 @@ public class App {
         dibujarGrafo.dibujar();
     }
 
-	private static void verConexion(ArrayList<java.awt.geom.Line2D.Double> conexiones) {
+    
+	/*private static void verConexion(ArrayList<java.awt.geom.Line2D.Double> conexiones) {
 		for (Line2D.Double conexion : conexiones) {
 		    double x1 = conexion.getX1();
 		    double y1 = conexion.getY1();
@@ -116,4 +115,6 @@ public class App {
 		}
 		
 	}
+    */
+    
 }
