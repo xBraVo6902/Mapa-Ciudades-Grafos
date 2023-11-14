@@ -2,5 +2,9 @@
     "java.project.explorer.showNonJavaResources": false,
     "java.project.sourcePaths": [
         ""
+    ],
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "json-20231013.jar"
     ]
 }
