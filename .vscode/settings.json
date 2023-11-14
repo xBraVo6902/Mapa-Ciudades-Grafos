@@ -6,5 +6,6 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "json-20231013.jar"
-    ]
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
 }

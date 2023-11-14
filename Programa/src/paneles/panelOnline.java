@@ -1,10 +1,7 @@
 package paneles;
 
-import aplicacion.App;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Font;
 
 public class panelOnline extends JPanel {
@@ -34,16 +31,6 @@ public class panelOnline extends JPanel {
 
 
      
-    }
-
-    private void chooseFile(JTextField textField) {
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(this);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            String selectedFilePath = fileChooser.getSelectedFile().getAbsolutePath();
-            textField.setText(selectedFilePath);
-        }
     }
 
 
