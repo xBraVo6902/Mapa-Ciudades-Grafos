@@ -17,23 +17,20 @@ public class DibujarGrafo extends JPanel {
     private ArrayList<MyPoint> coordenadas;
     private ArrayList<String> nombreCaminos;
     private double minX, minY, maxX, maxY;
-    private double zoom = 1.0;
+    private double zoom = 0.20;
     private double escalaX;
     private double escalaY;
     private Point2D.Double vistaCentro;
     private MyPoint nodoMasCercano = null;
-    private Point zoomCenter;
     
     private static final int TOP = 1;
     private static final int BOTTOM = 2;
     private static final int RIGHT = 4;
     private static final int LEFT = 8;
-    private int sumadorLineas = 0;
 
     private MyPoint primerNodo = null; //-->dibujar nodo rojo
     private MyPoint segundoNodo = null; //-->primerNodo!= null ---> dibujar nodo Azul
     
-    private Point2D.Double nodoResultante=null;
     private double vistaX;
     private double vistaY;
 
@@ -49,7 +46,6 @@ public class DibujarGrafo extends JPanel {
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
-
         vistaCentro = new Point2D.Double((maxX + minX) / 2, (maxY + minY) / 2);
 
         setFocusable(true);
@@ -201,21 +197,6 @@ public class DibujarGrafo extends JPanel {
 
         vistaX = (vistaCentro.getX() - minX) * escalaX;
         vistaY = (vistaCentro.getY() - minY) * escalaY;
-        int cantTotalLineas=0;
-        /*for (Line2D.Double conexion : conexiones) {
-            double x1 = (conexion.getX1() - minX) * escalaX - vistaX;
-            double y1 = (conexion.getY1() - minY) * escalaY - vistaY;
-            double x2 = (conexion.getX2() - minX) * escalaX - vistaX;
-            double y2 = (conexion.getY2() - minY) * escalaY - vistaY;
-            if(clipLine(x1,y1,x2,y2))
-            {
-                sumadorLineas++;
-                
-                g2d.draw(new Line2D.Double(x1, y1, x2, y2));
-            }
-            cantTotalLineas++;
-            
-        } */
         Line2D.Double conexion;
         String nombreCamino;
         for(int i =0; i <conexiones.size();i++)
@@ -228,8 +209,6 @@ public class DibujarGrafo extends JPanel {
             double y2 = (conexion.getY2() - minY) * escalaY - vistaY;
             if(clipLine(x1,y1,x2,y2))
             {
-
-                sumadorLineas++;
                 if (nombreCamino.compareToIgnoreCase("nan")==0) 
                 {
                         g2d.setColor(Color.DARK_GRAY);
@@ -244,19 +223,10 @@ public class DibujarGrafo extends JPanel {
                 }
                 g2d.draw(new Line2D.Double(x1, y1, x2, y2));
             }
-            cantTotalLineas++;
         }
-        System.out.println("Cantidad de lineas dibujadas: "+sumadorLineas);
-        System.out.println("Cantidad de lineas totales: "+cantTotalLineas);
-        cantTotalLineas=0;
-        sumadorLineas=0;
 
         // nodo mas cercano actual-.
         if (nodoMasCercano != null) {
-            double x = (nodoMasCercano.getX() - minX) * escalaX - vistaX;
-            double y = (nodoMasCercano.getY() - minY) * escalaY - vistaY;
-
-            int radio = 5;
             g2d.setColor(Color.RED);
             //g2d.drawOval((int) (x - radio), (int) (y - radio), 2 * radio, 2 * radio); //NO DIBUJAR EL NODO CLICK MAS RECIENTE
         }
