@@ -1,4 +1,5 @@
 package aplicacion;
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -9,6 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import java.awt.geom.Point2D;
 import java.awt.geom.Line2D;
 
 public class App {
