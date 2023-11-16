@@ -13,15 +13,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class DibujarGrafo extends JPanel {
-    private ArrayList<Line2D.Double> conexiones;
-    private ArrayList<MyPoint> coordenadas;
-    private ArrayList<String> nombreCaminos;
-    private double minX, minY, maxX, maxY;
+    private ArrayList<Line2D.Double> conexiones;//Todas las conexxiones del mapa
+    private ArrayList<MyPoint> coordenadas;//Todas las coordenadas del archivo nodes.xml
+    private ArrayList<String> nombreCaminos;//Los nombres de todas las calles; lista de Strings en paralelo con la lista "conexiones"
+    private double minX, minY, maxX, maxY;//Coordenadas maximas y minimas de "x" e "y". "x" positivo, "x" negativo, "y" positivo e "y" negativo
     private double zoom = 0.20;
     private double escalaX;
     private double escalaY;
     private Point2D.Double vistaCentro;
-    private MyPoint nodoMasCercano = null;
+    private MyPoint nodoMasCercano = null;//Variable de tipo MyPoint para almacenar la coordenada más cercano al puntero
     
     private static final int TOP = 1;
     private static final int BOTTOM = 2;
@@ -65,9 +65,12 @@ public class DibujarGrafo extends JPanel {
             }
         });
 
-        addMouseListener(new MouseAdapter() {
+        //Evento que nos permite encontrar las coordenadas del Mouse cuando hace click
+        addMouseListener(new MouseAdapter() 
+        {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) 
+            {
                 Point puntoClic = e.getPoint();
                 encontrarNodoMasCercano(puntoClic);
                 calcularCentroEnPantalla();
@@ -75,37 +78,45 @@ public class DibujarGrafo extends JPanel {
             }
         });
 
-        addMouseMotionListener(new MouseAdapter() {
-    private Point lastPoint;
+        addMouseMotionListener(new MouseAdapter() 
+        {
+            private Point lastPoint;
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        lastPoint = e.getPoint();
-    }
+            @Override
+            public void mousePressed(MouseEvent e) 
+            {
+                lastPoint = e.getPoint();
+            }
 
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if (lastPoint != null) {
-            int deltaX = e.getX() - lastPoint.x;
-            int deltaY = e.getY() - lastPoint.y;
-            lastPoint = e.getPoint();
+            @Override
+            public void mouseDragged(MouseEvent e) 
+            {
+                if (lastPoint != null) 
+                {
+                    int deltaX = e.getX() - lastPoint.x;
+                    int deltaY = e.getY() - lastPoint.y;
+                    lastPoint = e.getPoint();
 
-            vistaCentro.setLocation(
-                vistaCentro.getX() + deltaX / escalaX,
-                vistaCentro.getY() + deltaY / escalaY
-            );
-            repaint();
-        }
-    }
-});
+                    vistaCentro.setLocation(
+                        vistaCentro.getX() + deltaX / escalaX,
+                        vistaCentro.getY() + deltaY / escalaY
+                    );
+                    repaint();
+                }
+            }
+        });
 
         addMouseWheelListener(new MouseAdapter() {
             @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
+            public void mouseWheelMoved(MouseWheelEvent e) 
+            {
                 int notches = e.getWheelRotation();
-                if (notches < 0) {
+                if (notches < 0) 
+                {
                     zoomOut(e.getPoint());  // Pasa la posición del mouse como argumento
-                } else {
+                } 
+                else 
+                {
                     zoomIn(e.getPoint());  // Pasa la posición del mouse como argumento
                     
                 }
@@ -114,11 +125,13 @@ public class DibujarGrafo extends JPanel {
         
         
     
-     // Crear el botón y agregar un ActionListener para manejar su acción
+        // Crear el botón y agregar un ActionListener para cerrar la ventana del mapa
 	    JButton closeButton = new JButton("Cerrar");
-	    closeButton.addActionListener(new ActionListener() {
+	    closeButton.addActionListener(new ActionListener() 
+        {
 	        @Override
-	        public void actionPerformed(ActionEvent e) {
+	        public void actionPerformed(ActionEvent e) 
+            {
 	            // Cerrar la ventana al hacer clic en el botón
 	            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(DibujarGrafo.this);
 	            frame.dispose();
@@ -128,42 +141,56 @@ public class DibujarGrafo extends JPanel {
         // Crear un panel para contener el botón y agregarlo al panel principal
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(closeButton);
-        add(buttonPanel, BorderLayout.SOUTH); // Puedes ajustar la posición del botón según tus necesidades
+        add(buttonPanel, BorderLayout.SOUTH); // Ajustar la posición del botón
     }
 
-    private void encontrarNodoMasCercano(Point puntoClic) {
+    //
+    private void encontrarNodoMasCercano(Point puntoClic) 
+    {
         double distanciaMinima = Double.MAX_VALUE;
         nodoMasCercano = null;
 
-        for (MyPoint punto : coordenadas) {
+        for (MyPoint punto : coordenadas) 
+        {
             double x = (punto.getX() - minX) * escalaX - vistaX;
             double y = (punto.getY() - minY) * escalaY - vistaY;
             double distancia = puntoClic.distance(x, y); 
 
-            if (distancia < distanciaMinima) {
+            //Condición para encontrar el nodo y la distancia más cercana al nodo, según el click del mouse.
+            if (distancia < distanciaMinima) 
+            {
                 distanciaMinima = distancia;
                 nodoMasCercano = punto;
             }
         }
 
-        if (distanciaMinima < 1080) { // se define que si el mouse está a menos de 5 unidades de píxeles de un NODO este se selecciona
-            if (primerNodo == null) {
+        //Se define que si el mouse está a menos de 5 unidades de píxeles de un NODO este se selecciona
+        if (distanciaMinima < 1080) 
+        { 
+            //Se almacenan los nodos más cercanos al mouse.
+            if (primerNodo == null) 
+            {
                 primerNodo = nodoMasCercano;
                 System.out.println("Coordenada x " + primerNodo.getX() + " Coordenada Y " + primerNodo.getY() + " ID Nodo " + primerNodo.getId());
-            } else if (segundoNodo == null) {
+            } 
+            else if (segundoNodo == null) 
+            {
                 segundoNodo = nodoMasCercano;
                 System.out.println("Coordenada x " + segundoNodo.getX() + " Coordenada Y " + segundoNodo.getY() + " ID Nodo " + segundoNodo.getId());
             }
         }
     }
-
-    private Point2D.Double calcularCentroEnPantalla() {
+    //Metodo para calcular el centro de la pantalla
+    private Point2D.Double calcularCentroEnPantalla() 
+    {
         double xCentro = (vistaCentro.getX() - minX) * escalaX - vistaX;
         double yCentro = (vistaCentro.getY() - minY) * escalaY - vistaY;
         return new Point2D.Double(xCentro, yCentro);
     }
 
-    private double distanciaHaversine(MyPoint punto1, MyPoint punto2) {
+    //Metodo Haversine, usado para calcular la distancia de los nodos en kilometros.
+    private double distanciaHaversine(MyPoint punto1, MyPoint punto2) 
+    {
         double radioTierra = 6371.0; // Radio de la Tierra en kilómetros
 
         // Convertir las coordenadas de los nodos a latitud y longitud
@@ -187,8 +214,10 @@ public class DibujarGrafo extends JPanel {
         return radioTierra * c; // Distancia en kilómetros
     }
 
+    //Metodo para dibujar en un JFrame
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) 
+    {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
@@ -207,8 +236,11 @@ public class DibujarGrafo extends JPanel {
             double y1 = (conexion.getY1() - minY) * escalaY - vistaY;
             double x2 = (conexion.getX2() - minX) * escalaX - vistaX;
             double y2 = (conexion.getY2() - minY) * escalaY - vistaY;
+
+            //Condicion que llama al metodo clipLine enfocado en realizar el cliping
             if(clipLine(x1,y1,x2,y2))
             {
+                //Se pintan los caminos según el nombre que posean (Se diferencian en ruta, nan y el resto de caminos)
                 if (nombreCamino.compareToIgnoreCase("nan")==0) 
                 {
                         g2d.setColor(Color.DARK_GRAY);
@@ -226,13 +258,15 @@ public class DibujarGrafo extends JPanel {
         }
 
         // nodo mas cercano actual-.
-        if (nodoMasCercano != null) {
+        if (nodoMasCercano != null) 
+        {
             g2d.setColor(Color.RED);
             //g2d.drawOval((int) (x - radio), (int) (y - radio), 2 * radio, 2 * radio); //NO DIBUJAR EL NODO CLICK MAS RECIENTE
         }
 
-        // primer nodo
-        if (primerNodo != null) {
+        // Marcar el primer nodo
+        if (primerNodo != null) 
+        {
             double x = (primerNodo.getX() - minX) * escalaX - vistaX;
             double y = (primerNodo.getY() - minY) * escalaY - vistaY;
 
@@ -241,8 +275,9 @@ public class DibujarGrafo extends JPanel {
             g2d.drawOval((int) (x - radio), (int) (y - radio), 2 * radio, 2 * radio);
         }
 
-        // Dibujar nodo 2
-        if (segundoNodo != null) {
+        // Marcar el segundo nodo
+        if (segundoNodo != null)
+        {
             double x = (segundoNodo.getX() - minX) * escalaX - vistaX;
             double y = (segundoNodo.getY() - minY) * escalaY - vistaY;
 
@@ -251,33 +286,40 @@ public class DibujarGrafo extends JPanel {
             g2d.drawOval((int) (x - radio), (int) (y - radio), 2 * radio, 2 * radio);
         }
 
-        if (primerNodo != null && segundoNodo != null) {
+        //Condicion enfocada en trazar una linea entre los 2 nodos marcados y calcular la distancia con el metodo "distanciaHaversine"
+        if (primerNodo != null && segundoNodo != null)
+        {
             double x = (primerNodo.getX() - minX) * escalaX - vistaX;
             double y = (primerNodo.getY() - minY) * escalaY - vistaY;
 
             double x2 = (segundoNodo.getX() - minX) * escalaX - vistaX;
             double y2 = (segundoNodo.getY() - minY) * escalaY - vistaY;
 
+            
             g2d.setColor(Color.ORANGE);
             g2d.draw(new Line2D.Double(x, y, x2, y2));
-
+            
             double distancia = distanciaHaversine(primerNodo, segundoNodo);
             System.out.println("Distancia entre dos nodos: " + distancia + " km");
         }
     }
 
-    private boolean clipLine(double x1, double y1, double x2, double y2) {
+    //Metodo que se preocupa de hacer clipping
+    private boolean clipLine(double x1, double y1, double x2, double y2) 
+    {
         double clipMinX = 0;
         double clipMinY = 0;
         double clipMaxX = getWidth();
         double clipMaxY = getHeight();
     
-        // Cohen-Sutherland line clipping algorithm
+        
         int outCode1 = calculateOutCode(x1, y1, clipMinX, clipMinY, clipMaxX, clipMaxY);
         int outCode2 = calculateOutCode(x2, y2, clipMinX, clipMinY, clipMaxX, clipMaxY);
     
-        while ((outCode1 | outCode2) != 0) {
-            if ((outCode1 & outCode2) != 0) {
+        while ((outCode1 | outCode2) != 0) 
+        {
+            if ((outCode1 & outCode2) != 0) 
+            {
                 // Ambos puntos están fuera de la ventana de visualización, la línea está completamente fuera
                 return false;
             }
@@ -288,19 +330,28 @@ public class DibujarGrafo extends JPanel {
             double x, y;
     
             // Encuentra la intersección de la línea con la ventana de visualización
-            if ((outCode & TOP) != 0) {
+            if ((outCode & TOP) != 0) 
+            {
                 x = x1 + (x2 - x1) * (clipMaxY - y1) / (y2 - y1);
                 y = clipMaxY;
-            } else if ((outCode & BOTTOM) != 0) {
+            } 
+            else if ((outCode & BOTTOM) != 0) 
+            {
                 x = x1 + (x2 - x1) * (clipMinY - y1) / (y2 - y1);
                 y = clipMinY;
-            } else if ((outCode & RIGHT) != 0) {
+            } 
+            else if ((outCode & RIGHT) != 0) 
+            {
                 y = y1 + (y2 - y1) * (clipMaxX - x1) / (x2 - x1);
                 x = clipMaxX;
-            } else if ((outCode & LEFT) != 0) {
+            } 
+            else if ((outCode & LEFT) != 0) 
+            {
                 y = y1 + (y2 - y1) * (clipMinX - x1) / (x2 - x1);
                 x = clipMinX;
-            } else {
+            } 
+            else 
+            {
                 // Este caso no debería ocurrir
                 return false;
             }
@@ -321,71 +372,84 @@ public class DibujarGrafo extends JPanel {
     }
     
     // Método para calcular el código de salida en el algoritmo de clipping
-    private int calculateOutCode(double x, double y, double clipMinX, double clipMinY, double clipMaxX, double clipMaxY) {
+    private int calculateOutCode(double x, double y, double clipMinX, double clipMinY, double clipMaxX, double clipMaxY) 
+    {
         int code = 0;
     
-        if (x < clipMinX) {
+        if (x < clipMinX) 
+        {
             code |= LEFT;
-        } else if (x > clipMaxX) {
+        } 
+        else if (x > clipMaxX) 
+        {
             code |= RIGHT;
         }
     
-        if (y < clipMinY) {
+        if (y < clipMinY) 
+        {
             code |= TOP;
-        } else if (y > clipMaxY) {
+        } 
+        else if (y > clipMaxY) 
+        {
             code |= BOTTOM;
         }
     
         return code;
     }
 
-    public void dibujar() {
+    public void dibujar() 
+    {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(this);
         frame.setSize(800, 600);
         frame.setVisible(true);
     }
-
-    public void zoomIn(Point mousePoint) {
+    //Metodo para aumentar el zoom
+    public void zoomIn(Point mousePoint) 
+    {
         double prevZoom = zoom;
         zoom *= 1.2;
         ajustarCentroZoom(mousePoint, prevZoom, zoom);
         repaint();
     }
-
-    public void zoomOut(Point mousePoint) {
+    //Metodo para disminuir el zoom
+    public void zoomOut(Point mousePoint) 
+    {
         double prevZoom = zoom;
         zoom /= 1.2;
         ajustarCentroZoom(mousePoint, prevZoom, zoom);
         repaint();
     }
-
-    private void ajustarCentroZoom(Point mousePoint, double prevZoom, double newZoom) {
+    //Calcular el centro de la pantalla y almacentarlo en la variable "vistaCentro"
+    private void ajustarCentroZoom(Point mousePoint, double prevZoom, double newZoom) 
+    {
         double factor = newZoom / prevZoom;
         double dx = (mousePoint.x - getWidth() / 2) / -escalaX;
         double dy = (mousePoint.y - getHeight() / 2) / -escalaY;
         vistaCentro.setLocation(vistaCentro.getX() - dx * factor, vistaCentro.getY() - dy * factor);
-        
-
     }
-
-    public void moveLeft() {
+    //metodo para desplazar la pantalla hacia la izquierda
+    public void moveLeft() 
+    {
         vistaCentro.setLocation(vistaCentro.getX() - (maxX - minX) * 0.05, vistaCentro.getY());
         repaint();
     }
-
-    public void moveRight() {
+    //metodo para desplazar la pantalla hacia la derecha
+    public void moveRight() 
+    {
         vistaCentro.setLocation(vistaCentro.getX() + (maxX - minX) * 0.05, vistaCentro.getY());
         repaint();
     }
-
-    public void moveUp() {
+    //metodo para desplazar la pantalla hacia arriba
+    public void moveUp() 
+    {
         vistaCentro.setLocation(vistaCentro.getX(), vistaCentro.getY() - (maxY - minY) * 0.05);
         repaint();
     }
-
-    public void moveDown() {
+    //metodo para desplazar la pantalla hacia abajo
+    public void moveDown() 
+    {
         vistaCentro.setLocation(vistaCentro.getX(), vistaCentro.getY() + (maxY - minY) * 0.05);
         repaint();
     }

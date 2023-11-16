@@ -1,5 +1,5 @@
 package aplicacion;
-
+//Clase que guardara las coordenadas "x" e "y" más el id de la coordenada
 public class MyPoint {
     private double id,x,y;
 

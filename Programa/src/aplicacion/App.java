@@ -49,6 +49,7 @@ public class App {
         progressDialog.setSize(300, 100);
         progressDialog.setLocationRelativeTo(null);
 
+        //Se trabaja en segundo plano la lectura de las coordenadas con la clase SwingWorker.
         SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
             @Override
             protected Void doInBackground() {
@@ -61,11 +62,11 @@ public class App {
                 double minX = Double.POSITIVE_INFINITY;
                 double minY = Double.POSITIVE_INFINITY;
 
-                // HashMap to store points by ID
+                // Objeto puntosPorId almacena una variable de tipo Double y un objeto de tipo MyPoint (enlaza el punto con el id del punto)
                 HashMap<Double, MyPoint> puntosPorId = new HashMap<>();
 
                 try {
-                    // Load the first XML file
+                    // Carga el primer archivo XML correspondiente a los nodos
                     try (FileInputStream fis = new FileInputStream(new File(filePath1));
                          InputStreamReader isr = new InputStreamReader(fis)) {
 
@@ -84,11 +85,13 @@ public class App {
                             double id = Double.parseDouble(rowElement.getElementsByTagName("osmid").item(0).getTextContent());
                             double x = Double.parseDouble(rowElement.getElementsByTagName("x").item(0).getTextContent());
                             double y = Double.parseDouble(rowElement.getElementsByTagName("y").item(0).getTextContent());
-
+                            
+                            //Se almacenan los datos rescatados del archivo nodes.xml
                             MyPoint punto = new MyPoint(id, x, y);
                             coordenadas.add(punto);
                             puntosPorId.put(id, punto);
 
+                            //Coordenadas maximas y minimas de "x" e "y". "x" positivo, "x" negativo, "y" positivo e "y" negativo
                             maxX = Math.max(maxX, x);
                             maxY = Math.max(maxY, y);
                             minX = Math.min(minX, x);
@@ -99,7 +102,7 @@ public class App {
                         }
                     }
 
-                    // Load the second XML file
+                    // Carga el segundo archivo XML correspondiente a los edges
                     try (FileInputStream fis = new FileInputStream(new File(filePath2));
                          InputStreamReader isr = new InputStreamReader(fis)) {
 
@@ -118,10 +121,11 @@ public class App {
                             double id_1 = Double.parseDouble(rowElement.getElementsByTagName("u").item(0).getTextContent());
                             double id_2 = Double.parseDouble(rowElement.getElementsByTagName("v").item(0).getTextContent());
                             String nombreCamino = rowElement.getElementsByTagName("name").item(0).getTextContent();
-
+                            //Se obtienen los puntos por id
                             MyPoint punto1 = puntosPorId.get(id_1);
                             MyPoint punto2 = puntosPorId.get(id_2);
 
+                            //Trozo de codigo que guarda las 2 coordenadas en un objeto de tipo Line2D.Double
                             if (punto1 != null && punto2 != null) {
                                 Line2D.Double conexion = new Line2D.Double(punto1.getX(), punto1.getY(), punto2.getX(), punto2.getY());
                                 conexiones.add(conexion);
@@ -145,11 +149,13 @@ public class App {
             }
 
             @Override
-            protected void done() {
+            protected void done() 
+            {
                 if (!cancelado) {
                     progressDialog.dispose();
                 }
             }
+            //Termina el SwingWorker
         };
 
         worker.addPropertyChangeListener(evt -> {
