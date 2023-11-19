@@ -1,6 +1,6 @@
 # javaProyect
 Integrantes:
 - Javier Saldaño
-- Camilo
+- Camilo Bravo
 - Ruben
 - Bruno Toro
