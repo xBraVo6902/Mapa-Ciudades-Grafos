@@ -2,5 +2,5 @@
 Integrantes:
 - Javier Saldaño
 - Camilo Bravo
-- Ruben
+- Ruben Rojas
 - Bruno Toro
