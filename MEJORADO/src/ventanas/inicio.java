@@ -149,7 +149,7 @@ public class inicio extends JFrame {
 	}
 	//Leer block de notas de los usuarios registrados
 	private void leerUsuarios() {
-		try {//Programa\\usuarios.txt
+		try {//MEJORADO\\usuarios.txt
 			Scanner read= new Scanner(new File("MEJORADO\\usuarios.txt"));
 			while(read.hasNextLine()) {
 				String line= read.nextLine();
