@@ -9,5 +9,8 @@
             "c:\\Users\\Bruno Toro\\Downloads\\json-20231013.jar"
         ]
     },
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.project.sourcePaths": [
+        "MEJORADO/src"
+    ]
 }
