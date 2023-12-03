@@ -2,7 +2,8 @@
     "java.project.referencedLibraries": {
         "include": [
             "lib/**/*.jar",
-            "c:\\Users\\Bruno Toro\\Downloads\\json-20231013.jar"
+            "c:\\Users\\Bruno Toro\\Downloads\\json-20231013.jar",
+            "c:\\Users\\Usuario\\Desktop\\PIPA\\json-20231013.jar"
         ],
         "exclude": [
             "c:\\Users\\Bruno Toro\\Downloads\\json-20231013.jar"
