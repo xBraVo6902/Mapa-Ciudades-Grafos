@@ -3,8 +3,7 @@
         "include": [
             "lib/**/*.jar",
             "C:\\Users\\javie\\OneDrive\\Escritorio\\Pipa\\json-20231013.jar",
-            "c:\\Users\\Bruno Toro\\Downloads\\json-20231013.jar",
-            "c:\\Users\\Usuario\\Desktop\\PIPA\\json-20231013.jar"
+            "c:\\Users\\Bruno Toro\\Downloads\\json-20231013.jar"
         ],
         "exclude": [
             "C:\\Users\\javie\\OneDrive\\Escritorio\\Pipa\\json-20231013.jar"
