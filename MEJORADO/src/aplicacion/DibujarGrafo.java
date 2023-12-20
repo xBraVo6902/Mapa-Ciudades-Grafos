@@ -1,10 +1,9 @@
 package aplicacion;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -38,6 +37,8 @@ public class DibujarGrafo extends JPanel {
     private double referenciaLatitud; // Establece la latitud de referencia aquí
     private double referenciaLongitud; // Establece la longitud de referencia aquí
 
+    private Point lastPoint;
+
     public DibujarGrafo(ArrayList<Line2D.Double> conexiones, ArrayList<MyPoint> coordenadas, double minX, double minY, double maxX, double maxY,ArrayList<String> nombreCaminos) {
         this.conexiones = conexiones;
         this.coordenadas = coordenadas;
@@ -50,22 +51,30 @@ public class DibujarGrafo extends JPanel {
 
         setFocusable(true);
         requestFocusInWindow();
-        addKeyListener(new KeyAdapter() {
+        
+        addMouseMotionListener(new MouseMotionAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    moveLeft();
-                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    moveRight();
-                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    moveUp();
-                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    moveDown();
+            public void mouseDragged(MouseEvent e) {
+                if (lastPoint != null) {
+                    int deltaX = lastPoint.x - e.getX();
+                    int deltaY = lastPoint.y - e.getY();
+
+                    vistaCentro.setLocation(
+                        vistaCentro.getX() + deltaX / escalaX,
+                        vistaCentro.getY() + deltaY / escalaY
+                    );
                 }
+                lastPoint = e.getPoint();
+                repaint();
             }
         });
 
         addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                lastPoint = e.getPoint();
+            }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 Point puntoClic = e.getPoint();
@@ -75,29 +84,6 @@ public class DibujarGrafo extends JPanel {
             }
         });
 
-        addMouseMotionListener(new MouseAdapter() {
-    private Point lastPoint;
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        lastPoint = e.getPoint();
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if (lastPoint != null) {
-            int deltaX = e.getX() - lastPoint.x;
-            int deltaY = e.getY() - lastPoint.y;
-            lastPoint = e.getPoint();
-
-            vistaCentro.setLocation(
-                vistaCentro.getX() + deltaX / escalaX,
-                vistaCentro.getY() + deltaY / escalaY
-            );
-            repaint();
-        }
-    }
-});
 
         addMouseWheelListener(new MouseAdapter() {
             @Override
