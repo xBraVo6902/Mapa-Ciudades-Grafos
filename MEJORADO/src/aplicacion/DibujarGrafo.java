@@ -39,6 +39,8 @@ public class DibujarGrafo extends JPanel {
 
     private Point lastPoint;
 
+    private JTextArea panelDeInformacion;
+
     public DibujarGrafo(ArrayList<Line2D.Double> conexiones, ArrayList<MyPoint> coordenadas, double minX, double minY, double maxX, double maxY,ArrayList<String> nombreCaminos) {
         this.conexiones = conexiones;
         this.coordenadas = coordenadas;
@@ -51,7 +53,6 @@ public class DibujarGrafo extends JPanel {
 
         setFocusable(true);
         requestFocusInWindow();
-        
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -98,6 +99,20 @@ public class DibujarGrafo extends JPanel {
             }
         });
         
+
+        JButton deselectButton = new JButton("Desmarcar Nodos");
+        deselectButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        // Código para desmarcar los nodos
+        // Esto dependerá de cómo esté implementada tu clase de nodo
+        primerNodo = null;
+        segundoNodo = null;
+        panelDeInformacion.setText("");
+        repaint();
+        }
+    });
+
         
     
      // Crear el botón y agregar un ActionListener para manejar su acción
@@ -115,7 +130,13 @@ public class DibujarGrafo extends JPanel {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(closeButton);
         add(buttonPanel, BorderLayout.SOUTH); // Puedes ajustar la posición del botón según tus necesidades
+        // Agregar el botón al panel de botones
+        buttonPanel.add(deselectButton);
+        add(buttonPanel, BorderLayout.SOUTH); // Puedes ajustar la posición del botón según tus necesidades
+
     }
+
+    
 
     private void encontrarNodoMasCercano(Point puntoClic) {
         double distanciaMinima = Double.MAX_VALUE;
@@ -131,17 +152,21 @@ public class DibujarGrafo extends JPanel {
                 nodoMasCercano = punto;
             }
         }
+        
 
         if (distanciaMinima < 1080) { // se define que si el mouse está a menos de 5 unidades de píxeles de un NODO este se selecciona
             if (primerNodo == null) {
                 primerNodo = nodoMasCercano;
                 System.out.println("Coordenada x " + primerNodo.getX() + " Coordenada Y " + primerNodo.getY() + " ID Nodo " + primerNodo.getId());
-            } else if (segundoNodo == null) {
+                actualizarPanelDeInformacion();
+            } else if (segundoNodo == null && nodoMasCercano != primerNodo) {
                 segundoNodo = nodoMasCercano;
                 System.out.println("Coordenada x " + segundoNodo.getX() + " Coordenada Y " + segundoNodo.getY() + " ID Nodo " + segundoNodo.getId());
-            }
+                actualizarPanelDeInformacion();
+            } 
         }
     }
+    
 
     private Point2D.Double calcularCentroEnPantalla() {
         double xCentro = (vistaCentro.getX() - minX) * escalaX - vistaX;
@@ -172,6 +197,23 @@ public class DibujarGrafo extends JPanel {
 
         return radioTierra * c; // Distancia en kilómetros
     }
+
+    // Método para actualizar el JTextArea
+    private void actualizarPanelDeInformacion() {
+        // Declarar JTextArea
+        
+
+        // Inicializar JTextArea (por ejemplo, en el constructor)
+        panelDeInformacion = new JTextArea();
+        panelDeInformacion.setEditable(false); // para que el usuario no pueda editar el texto
+        add(panelDeInformacion); // añadir el JTextArea al contenedor
+    if (primerNodo != null && segundoNodo != null) {
+        String infoPrimerNodo = "Coordenada x " + primerNodo.getX() + " Coordenada Y " + primerNodo.getY() + " ID Nodo " + primerNodo.getId();
+        String infoSegundoNodo = "Coordenada x " + segundoNodo.getX() + " Coordenada Y " + segundoNodo.getY() + " ID Nodo " + segundoNodo.getId();
+        double distancia = distanciaHaversine(primerNodo, segundoNodo);
+        panelDeInformacion.setText(infoPrimerNodo + "\n" + infoSegundoNodo + "\nDistancia: " + distancia + " KM");
+    }
+}
 
     @Override
     protected void paintComponent(Graphics g) {
